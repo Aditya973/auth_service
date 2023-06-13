@@ -22,6 +22,27 @@ const create = async (req,res) => {
     }
 }
 
+const get = async (req,res) => {
+    try {
+        const user = await userService.get(req.params.id);
+        return res.status(200).json({
+            data:user,
+            success:true,
+            message:'succesfully fetched',
+            err : {}
+        });
+    } 
+    catch (error) {
+        return res.status(500).json({
+            data : {},
+            success : false,
+            message: 'something went wrong',
+            err : error
+        });
+    }
+}
+
 module.exports = {
-    create
+    create,
+    get
 };
