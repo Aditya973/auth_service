@@ -42,7 +42,27 @@ const get = async (req,res) => {
     }
 }
 
+const signIn = async (req,res) => {
+    try {
+        const response = await userService.signIn(req.body.email,req.body.password);
+        return res.status(200).json({
+            data:response,
+            success:true,
+            message: 'successfully signed in',
+            err: {}
+        })
+    } catch (error) {
+        return res.status(500).json({
+            data : {},
+            success : false,
+            message: 'something went wrong',
+            err : error
+        });
+    }
+}
+
 module.exports = {
     create,
-    get
+    get,
+    signIn
 };
