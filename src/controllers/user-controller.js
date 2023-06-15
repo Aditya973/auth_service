@@ -4,7 +4,6 @@ const userService = new UserService();
 
 const create = async (req,res) => {
     try {
-        console.log(req.body);
         const response = await userService.create(req.body);
         return res.status(201).json({
             data:response,
@@ -13,11 +12,12 @@ const create = async (req,res) => {
             err: {}
         })
     } catch (error) {
-        return res.status(500).json({
+        console.log(error);
+        return res.status(error.statusCode).json({
             data : {},
             success : false,
-            message: 'something went wrong',
-            err : error
+            message: error.message,
+            err : error.explaination
         })
     }
 }
@@ -52,7 +52,7 @@ const signIn = async (req,res) => {
             err: {}
         })
     } catch (error) {
-        return res.status(500).json({
+        return res.status(error.statusCode).json({
             data : {},
             success : false,
             message: 'something went wrong',
@@ -81,9 +81,30 @@ const isAuthenticated = async (req,res) => {
     }
 }
 
+const isAdmin = async (req,res) => {
+    try {
+        const response = await userService.isAdmin(req.body.id);
+        return res.status(200).json({
+            data:response,
+            success : true,
+            message : 'successfully fetched whether user is admin or not',
+            err: {}
+        });
+    } catch (error) {
+        return res.status(500).json({
+            data : {},
+            success : false,
+            message: 'something went wrong',
+            err : error
+        });
+    }
+    
+}
+
 module.exports = {
     create,
     get,
     signIn,
-    isAuthenticated
+    isAuthenticated,
+    isAdmin
 };

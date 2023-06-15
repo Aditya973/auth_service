@@ -2,6 +2,9 @@ const UserRepository = require('../repositories/user-repository');
 const jwt = require('jsonwebtoken');
 const { JWT_KEY } = require('../config/serverConfig');
 const bcrypt = require('bcrypt');
+const AppErrors = require('../utils/error-handler');
+const {StatusCodes} = require('http-status-codes');
+const ClientError = require('../utils/client-error');
 
 class UserService{
     constructor(){
@@ -13,8 +16,16 @@ class UserService{
             const user = await this.userRepository.create(data);
             return user;
         } catch (error) {
+            if(error.name == 'SequelizeValidationError'){
+                throw error;
+            }
             console.log("something went wrong in the service layer");
-            throw error;
+            throw new AppErrors(
+                'ServerError',
+                'logical issue found',
+                'something went wrong in the service',
+                500
+            );
         }
     }
 
@@ -39,7 +50,12 @@ class UserService{
 
             if(!passwordMatch){
                 console.log('password does not match!');
-                throw {error : 'Incorrect Password!'};
+                throw new ClientError(
+                    'AttributeNotFound',
+                    'Incorrect Password',
+                    'Please Check the password as it is not correct',
+                    StatusCodes.BAD_REQUEST
+                );
             }
 
             // if password match create a new token and send it to the user
@@ -100,6 +116,15 @@ class UserService{
         }
     }
 
+    async isAdmin(userId){
+        try {
+            const response = await this.userRepository.isAdmin(userId);
+            return response;
+        } catch (error) {
+            console.log("something went wrong in service layer");
+            throw error
+        }
+    }
 }
 
 module.exports = UserService;
